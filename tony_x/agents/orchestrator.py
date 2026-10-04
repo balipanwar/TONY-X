@@ -1,30 +1,31 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Type
+from typing import List, Optional
 
-from .base_agent import BaseAgent
+from .base_agent import AgentTask, AgentResult
+from .registry import AgentRegistry
 
 
-class AgentRegistry:
-    """Registry that stores and retrieves agent implementations."""
+class AgentOrchestrator:
+    """Route tasks to agents based on registration and capability metadata."""
 
-    def __init__(self):
-        self._agents: Dict[str, BaseAgent] = {}
+    def __init__(self, agent_registry: Optional[AgentRegistry] = None):
+        self.registry = agent_registry or AgentRegistry()
 
-    def register(self, agent: BaseAgent) -> None:
-        self._agents[agent.name] = agent
+    def register_agent(self, agent) -> None:
+        self.registry.register(agent)
 
-    def unregister(self, agent_name: str) -> None:
-        self._agents.pop(agent_name, None)
+    def dispatch(self, task: AgentTask, agent_name: Optional[str] = None) -> AgentResult:
+        if agent_name is None:
+            if not self.registry.list_agents():
+                raise ValueError("No registered agents available for dispatch")
+            agent_name = self.registry.list_agents()[0]
 
-    def get(self, agent_name: str) -> Optional[BaseAgent]:
-        return self._agents.get(agent_name)
+        agent = self.registry.get(agent_name)
+        if agent is None:
+            raise ValueError(f"Unknown agent: {agent_name}")
 
-    def list_agents(self) -> List[str]:
-        return sorted(self._agents.keys())
+        return agent.execute(task)
 
-    def has_agent(self, agent_name: str) -> bool:
-        return agent_name in self._agents
-
-    def clear(self) -> None:
-        self._agents.clear()
+    def available_agents(self) -> List[str]:
+        return self.registry.list_agents()

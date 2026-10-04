@@ -1,15 +1,30 @@
-"""Agent registration and orchestration for TONY-X."""
+from __future__ import annotations
 
-from .base_agent import AgentMessage, AgentResult, AgentTask, BaseAgent, SimpleAgent
-from .registry import AgentRegistry
-from .orchestrator import AgentOrchestrator
+from typing import Dict, List, Optional
 
-__all__ = [
-    "AgentMessage",
-    "AgentResult",
-    "AgentTask",
-    "BaseAgent",
-    "SimpleAgent",
-    "AgentRegistry",
-    "AgentOrchestrator",
-]
+from .base_agent import BaseAgent
+
+
+class AgentRegistry:
+    """Registry that stores and retrieves agent implementations."""
+
+    def __init__(self):
+        self._agents: Dict[str, BaseAgent] = {}
+
+    def register(self, agent: BaseAgent) -> None:
+        self._agents[agent.name] = agent
+
+    def unregister(self, agent_name: str) -> None:
+        self._agents.pop(agent_name, None)
+
+    def get(self, agent_name: str) -> Optional[BaseAgent]:
+        return self._agents.get(agent_name)
+
+    def list_agents(self) -> List[str]:
+        return sorted(self._agents.keys())
+
+    def has_agent(self, agent_name: str) -> bool:
+        return agent_name in self._agents
+
+    def clear(self) -> None:
+        self._agents.clear()
