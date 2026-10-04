@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tony-x"
+version = "0.1.0"
+description = "Technology Research & Invention AI"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+  { name = "balipanwar" }
+]
+dependencies = [
+  "pydantic>=2.7.0",
+  "fastapi>=0.111.0",
+  "uvicorn>=0.30.0",
+  "numpy>=1.26.0",
+  "scipy>=1.11.0",
+  "sympy>=1.12.0",
+  "pytest>=8.0.0"
+]
+
+[project.scripts]
+tony = "tony_x.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
